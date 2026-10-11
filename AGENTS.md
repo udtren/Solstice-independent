@@ -101,6 +101,8 @@ Read these before adding or updating any feature:
   `docs/agent/overview-live-update.md`
 - Versioning (Solstice version vs. Krita compatibility version):
   `docs/agent/versioning.md`
+- Executable name (`solstice.exe`/`solstice.com` on Windows; `krita.dll` and
+  the application name `krita` kept): `docs/agent/executable-name.md`
 - Settings location (`%APPDATA%\Solstice`, Krita profile import, Solstice defaults):
   `docs/agent/settings-location.md`
 - GPU Engine (branch `krita-sol-gpu`): `docs/agent/gpu-engine.md`

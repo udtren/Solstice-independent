@@ -662,3 +662,13 @@ Format: `## YYYY-MM-DD <kind>: <subject>`, then what changed and the sources.
   `Default.kws`; changing only the workspace file leaves new profiles as
   they were.
 - User manual check OK on 2026-10-11.
+
+## 2026-10-11 ingest: solstice.exe
+
+- The Windows launchers are `solstice.exe` and `solstice.com`; `krita.dll`
+  and the application name `krita` stay ([executable-name.md](../executable-name.md)).
+- Lesson: before `KAboutData`, Qt takes the application name from the
+  executable, so renaming the launcher needs an explicit
+  `setApplicationName("krita")`; the profile paths were already explicit.
+- Pitfall: CMake installs do not remove the old `krita.exe`/`krita.com`.
+- User manual check OK on 2026-10-11.

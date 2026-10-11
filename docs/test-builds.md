@@ -7,8 +7,9 @@ ordinary pushes and pull requests do not start it.
 Open [Actions](https://github.com/udtren/Solstice/actions/workflows/windows-build.yml),
 select **Run workflow**, and choose the development branch. When a run succeeds,
 download its **Solstice-windows-x64** artifact. Extract the artifact, then extract
-the application ZIP inside it. Launch `bin/krita.exe` from the extracted folder;
-the internal executable name remains unchanged for compatibility.
+the application ZIP inside it. Launch `bin/solstice.exe` from the extracted
+folder (`bin/solstice.com` starts it from a console). Builds before
+October 11, 2026 used `bin/krita.exe`; the settings stay in the same place.
 
 The ZIP includes a `shellex` folder with the Krita Shell Extension. Run
 `shellex/register-thumbnails.cmd` to show `.kra` and `.krz` thumbnails in

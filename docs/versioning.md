@@ -14,7 +14,7 @@ current version is **0.2.0-alpha**.
 
 The version appears on the splash screen, in **Help > About Solstice**, in
 **Help > Show system information for bug reports** and in the file
-properties of `krita.exe` on Windows.
+properties of `solstice.exe` on Windows.
 
 ## The Krita version
 

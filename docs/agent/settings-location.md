@@ -25,7 +25,7 @@ User decisions (2026-10-07):
 
 **Solstice shares every file with a stock Krita install.**
 
-- The application name is `krita` (taken from `krita.exe` before
+- The application name is `krita` (then taken from `krita.exe` before
   `KAboutData`), so `AppDataLocation` is `%APPDATA%\krita`.
 - The main KConfig file is `applicationName() + "rc"` = `kritarc`.
 - `GenericConfigLocation` and `GenericDataLocation` are `%LOCALAPPDATA%`
@@ -530,7 +530,7 @@ the test programs lacked Qt's MIME database
 **Manual, confirmed by the user (2026-10-07).** Each ran on a scratch
 profile.
 `SOLSTICE_PROFILE_ROOT` is set in PowerShell, then `run-krita.bat` starts
-Solstice. Starting `krita.exe` directly does not work without the
+Solstice. Starting `krita.exe` (now `solstice.exe`, 2026-10-11) directly does not work without the
 development environment.
 
 1. Krita profile present, **No**: Solstice defaults; the real Krita and

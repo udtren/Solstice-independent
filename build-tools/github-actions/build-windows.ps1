@@ -55,7 +55,7 @@ if ($Stage -eq 'configure') {
 } elseif ($Stage -eq 'build') {
     Invoke-Logged cmake @('--build', $Build, '--parallel', "$Jobs") 'build.log'
     Invoke-Logged cmake @('--install', $Build) 'install.log'
-    foreach ($Required in @('bin/krita.exe', 'bin/krita.com', 'bin/krita.dll', 'bin/libkritagpu.dll')) {
+    foreach ($Required in @('bin/solstice.exe', 'bin/solstice.com', 'bin/krita.dll', 'bin/libkritagpu.dll')) {
         if (-not (Test-Path (Join-Path $Install $Required))) { throw "Missing output: $Required" }
     }
 } else {

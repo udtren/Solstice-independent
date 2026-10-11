@@ -4,7 +4,7 @@ setlocal
 set "KRITA_DEV_ROOT=%~dp0..\krita-dev"
 set "KRITA_ENV=%KRITA_DEV_ROOT%\env.bat"
 set "PYTHON_ACTIVATE=%KRITA_DEV_ROOT%\PythonEnv\Scripts\activate.bat"
-set "KRITA_EXE=%KRITA_DEV_ROOT%\_install\bin\krita.exe"
+set "KRITA_EXE=%KRITA_DEV_ROOT%\_install\bin\solstice.exe"
 
 if not exist "%KRITA_ENV%" (
     echo Krita development environment script not found:

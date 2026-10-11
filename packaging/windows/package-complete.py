@@ -307,7 +307,7 @@ for arg in ("objdump", "llvm-objdump"):
 if not OBJDUMP:
     logger.error("objdump is not working.")
     sys.exit(1)
-output = subprocess.check_output(fr"{OBJDUMP} -f {KRITA_INSTALL_DIR}\bin\krita.exe", text=True)
+output = subprocess.check_output(fr"{OBJDUMP} -f {KRITA_INSTALL_DIR}\bin\solstice.exe", text=True)
 targetArchLines = output.splitlines()
 
 TARGET_ARCH_LINE = ""
@@ -402,7 +402,7 @@ elif IS_LLVM_MINGW:
         asanLibName = 'libclang_rt.asan_dynamic-x86_64'
         os.environ['STDLIBS_DIR'] = fr"{os.environ['MINGW_BIN_DIR']}\..\x86_64-w64-mingw32\bin"
 
-    output = subprocess.check_output(fr"{OBJDUMP} -p {KRITA_INSTALL_DIR}\bin\krita.exe", text=True)
+    output = subprocess.check_output(fr"{OBJDUMP} -p {KRITA_INSTALL_DIR}\bin\solstice.exe", text=True)
 
     if re.search(asanLibName, output):
         logger.info('The package contains ASAN, packaging the ASAN runtime as well!')
@@ -433,9 +433,9 @@ for lib in os.environ['STDLIBS'].split(" "):
 
 logger.info("")
 logger.info("Copying files...")
-# krita.exe
-shutil.copy(f"{KRITA_INSTALL_DIR}\\bin\\krita.exe", f"{pkg_root}\\bin\\")
-shutil.copy(f"{KRITA_INSTALL_DIR}\\bin\\krita.com", f"{pkg_root}\\bin\\")
+# solstice.exe (Solstice launcher; docs/agent/executable-name.md)
+shutil.copy(f"{KRITA_INSTALL_DIR}\\bin\\solstice.exe", f"{pkg_root}\\bin\\")
+shutil.copy(f"{KRITA_INSTALL_DIR}\\bin\\solstice.com", f"{pkg_root}\\bin\\")
 if os.path.isfile(f"{KRITA_INSTALL_DIR}\\bin\\krita.pdb"):
     shutil.copy(f"{KRITA_INSTALL_DIR}\\bin\\krita.pdb", f"{pkg_root}\\bin\\")
 # kritarunner.exe
@@ -586,13 +586,13 @@ if useQt6Build:
         "-gui", "-core", "-core5compat", "-openglwidgets", "-svgwidgets", "-opengl",
         "-concurrent", "-network", "-printsupport", "-svg",
         "-xml", "-sql", "-qml", "-quick", "-quickwidgets", *verboseOption,
-        f"{pkg_root}\\bin\\krita.exe", f"{pkg_root}\\bin\\krita.dll"])
+        f"{pkg_root}\\bin\\solstice.exe", f"{pkg_root}\\bin\\krita.dll"])
 else:
     verboseOption = ["-verbose", "2"] if useVerbosePackagingLog else []
     run_subprocess_checked(
         ["windeployqt.exe", *QMLDIR_ARGS, "--release", "-gui", "-core", "-concurrent", "-network", "-printsupport", "-svg",
         "-xml", "-sql", "-qml", "-quick", "-quickwidgets", *verboseOption,
-        f"{pkg_root}\\bin\\krita.exe", f"{pkg_root}\\bin\\krita.dll"])
+        f"{pkg_root}\\bin\\solstice.exe", f"{pkg_root}\\bin\\krita.dll"])
 
 # ffmpeg
 if os.path.exists(f"{DEPS_INSTALL_DIR}\\bin\\ffmpeg.exe"):
@@ -701,8 +701,8 @@ if not os.environ.get('KRITACI_SKIP_SPLIT_DEBUG', '0').lower() in ['true', '1', 
             return status.returncode
         return 0
 
-    split_debug(fr"{pkg_root}\bin\krita.exe", r"bin\krita.exe")
-    split_debug(fr"{pkg_root}\bin\krita.com", r"bin\krita.com")
+    split_debug(fr"{pkg_root}\bin\solstice.exe", r"bin\solstice.exe")
+    split_debug(fr"{pkg_root}\bin\solstice.com", r"bin\solstice.com")
     for executable in ("kritarunner.exe", "kritarunner.com", "ffmpeg.exe", "ffprobe.exe"):
         executable_path = fr"{pkg_root}\bin\{executable}"
         if os.path.isfile(executable_path):

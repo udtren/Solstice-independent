@@ -82,7 +82,7 @@ appears in the version strings.
 - After reconfiguring, check the CMake output for
   `-- Solstice version: <version>`, and check that
   `_build/libs/version/kritaversion.h` defines both versions.
-- `(Get-Item <install>\bin\krita.exe).VersionInfo`: `ProductName` is
+- `(Get-Item <install>\bin\solstice.exe).VersionInfo`: `ProductName` is
   `Solstice`, and the versions are the Solstice version.
 - Manual checks: the splash screen and Help > About show the Solstice version;
   Help > Show system information shows both versions; a saved `.kra` still has

@@ -34,7 +34,7 @@ When the agent's shell is Git Bash:
 - Put scratch files that native tools must read under the agent's scratch
   directory (`$TMPDIR`), not bare `/tmp`.
 - Check for a running Krita before installing with
-  `MSYS_NO_PATHCONV=1 tasklist /FI "IMAGENAME eq krita.exe"` (Git Bash) or
+  `MSYS_NO_PATHCONV=1 tasklist /FI "IMAGENAME eq solstice.exe"` (and `krita.exe` for older launchers) (Git Bash) or
   `Get-Process krita` (PowerShell).
 
 ## Build

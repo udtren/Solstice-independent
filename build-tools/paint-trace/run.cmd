@@ -12,7 +12,7 @@ if "%solsticeTraceMode%"=="brush" goto configured
 goto usage
 :configured
 if not exist "%~1\env.bat" goto failed
-if not exist "%~1\_install\bin\krita.com" goto failed
+if not exist "%~1\_install\bin\solstice.com" goto failed
 call "%~1\env.bat" >nul 2>&1
 if errorlevel 1 goto failed
 call "%~1\PythonEnv\Scripts\activate.bat" >nul 2>&1
@@ -30,7 +30,7 @@ if /i "%~3"=="--check" (
     echo Paint trace launcher environment OK. Application was not started.
     exit /b 0
 )
-powershell.exe -NoProfile -Command "if (Get-Process krita,krita.com -ErrorAction SilentlyContinue) { exit 1 }"
+powershell.exe -NoProfile -Command "if (Get-Process solstice,krita -ErrorAction SilentlyContinue) { exit 1 }"
 if errorlevel 1 (
     echo Close Solstice before starting a separate measurement process.
     pause
@@ -38,7 +38,7 @@ if errorlevel 1 (
 )
 pushd "%~1\_install\bin"
 if errorlevel 1 goto failed
-krita.com > "%KRITA_PAINT_TRACE%.launch.log" 2>&1
+solstice.com > "%KRITA_PAINT_TRACE%.launch.log" 2>&1
 set "solsticeTraceExit=%errorlevel%"
 popd
 echo Application exit code: %solsticeTraceExit%

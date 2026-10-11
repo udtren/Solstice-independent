@@ -305,9 +305,12 @@ if (WIN32)
     else()
         target_link_libraries(krita_windows_stub_exe PRIVATE Qt5::WinMain)
     endif()
+    # Solstice: the launchers are solstice.exe and solstice.com; krita.dll
+    # and the application name ("krita", set in main.cc) are unchanged
+    # (docs/agent/executable-name.md).
     set_target_properties(krita_windows_stub_exe
         PROPERTIES
-            OUTPUT_NAME "krita"
+            OUTPUT_NAME "solstice"
     )
     if (MSVC)
         target_link_options(krita_windows_stub_exe PRIVATE "/DEBUG:NONE")
@@ -323,13 +326,13 @@ if (WIN32)
     set_target_properties(krita_windows_stub_com
         PROPERTIES
             WIN32_EXECUTABLE false
-            OUTPUT_NAME "krita"
+            OUTPUT_NAME "solstice"
             SUFFIX ".com"
     )
     if (MSVC)
         target_link_options(krita_windows_stub_com PRIVATE "/DEBUG:NONE")
         # If MSVC uses incremental linking, it will race the database
-        # for krita.exe with the one for krita.com.
+        # for solstice.exe with the one for solstice.com.
         add_dependencies(krita_windows_stub_com krita_windows_stub_exe)
     endif()
     install(TARGETS krita_windows_stub_com ${INSTALL_TARGETS_DEFAULT_ARGS})

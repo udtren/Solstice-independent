@@ -58,7 +58,8 @@ Both generated Windows ICOs passed pixel and declared-dimension checks at all
 seven sizes (16, 24, 32, 48, 64, 128, 256). Installation completed after the user
 closed `krita.com`; `krita.dll`, `libkritaui.dll`, both Windows stubs and both
 installer ICOs match their build SHA-256 hashes. When checking for a running
-application on Windows, check both process names `krita` and `krita.com`.
+application on Windows, check both process names `krita` and `krita.com`
+(`solstice` since 2026-10-11).
 Interactive splash/About/taskbar appearance needs a restarted application;
 macOS, Linux, MSIX packaging, icon-cache and scaling checks remain open.
 
@@ -139,6 +140,9 @@ same whenever the masters are regenerated.
       256, 512, and 1024 pixels where the platform supports those sizes.
 - [x] Replace `krita/pics/branding/default/krita.ico` while retaining the filename until
       the executable and packaging rename is completed.
+- [x] Rename the Windows launchers to `solstice.exe` and `solstice.com`
+      (2026-10-11, `docs/agent/executable-name.md`); `krita.dll`, the icon file
+      names and the application name `krita` stay.
 - [ ] Replace the Apple `krita.icon` asset package and verify its generated ICNS output.
 - [ ] Update `branding.qrc` and the `krita-branding` resource alias only if a coordinated
       code migration is made; the alias may safely remain internal.

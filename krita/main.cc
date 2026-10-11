@@ -356,6 +356,11 @@ bool finishSolsticeImport()
 
 extern "C" MAIN_EXPORT int MAIN_FN(int argc, char **argv)
 {
+    // Solstice: the Windows launcher is solstice.exe, but the application
+    // name stays "krita" (Qt would take the executable's name) until
+    // KAboutData sets it below; folders and settings depend on it
+    // (docs/agent/executable-name.md).
+    QCoreApplication::setApplicationName(QStringLiteral("krita"));
 
 #ifdef Q_OS_WIN
     // Fix QCommandLineParser help output with UTF-8 codepage:
