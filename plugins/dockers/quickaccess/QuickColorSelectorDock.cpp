@@ -5,24 +5,63 @@
 
 #include "QuickColorSelectorDock.h"
 
+#include <KisColorSelectorConfiguration.h>
 #include <KisViewManager.h>
 #include <KisVisualColorSelector.h>
+#include <KoColorSpaceRegistry.h>
 #include <kconfiggroup.h>
 #include <kis_canvas2.h>
 #include <kis_canvas_resource_provider.h>
 #include <kis_display_color_converter.h>
+#include <kis_icon_utils.h>
 #include <klocalizedstring.h>
 #include <ksharedconfig.h>
 
+#include <QButtonGroup>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
+#include <QPixmap>
 #include <QSignalBlocker>
 #include <QSlider>
 #include <QSpinBox>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidgetAction>
+
+namespace
+{
+const char ShapeKey[] = "SelectorShape";
+
+/// Tells every HueSVC (docker and popup) that the stored shape changed.
+class ShapeNotifier : public QObject
+{
+    Q_OBJECT
+public:
+    static ShapeNotifier *instance()
+    {
+        static ShapeNotifier notifier;
+        return &notifier;
+    }
+Q_SIGNALS:
+    void shapeChanged();
+};
+} // namespace
+
+QuickColorSelectorWidget::Shape QuickColorSelectorWidget::storedShape()
+{
+    const KConfigGroup config = KSharedConfig::openConfig()->group(QStringLiteral("QuickAccessHueSVC"));
+    return config.readEntry(ShapeKey, QStringLiteral("slider")) == QStringLiteral("ring") ? Shape::Ring : Shape::Slider;
+}
+
+KisColorSelectorConfiguration QuickColorSelectorWidget::configuration(Shape shape)
+{
+    using KCSC = KisColorSelectorConfiguration;
+    return shape == Shape::Ring ? KCSC(KCSC::Square, KCSC::Ring, KCSC::SV, KCSC::H)
+                                : KCSC(KCSC::Square, KCSC::Slider, KCSC::SV, KCSC::H);
+}
 
 QuickColorSelectorWidget::QuickColorSelectorWidget(QWidget *parent)
     : QWidget(parent)
@@ -33,15 +72,55 @@ QuickColorSelectorWidget::QuickColorSelectorWidget(QWidget *parent)
     layout->setContentsMargins(4, 4, 4, 4);
     layout->setSpacing(6);
 
+    // Header: small overlapping swatches like the Wide Gamut Color
+    // Selector's (24 px), and the shape button at the right.
+    auto *header = new QHBoxLayout;
+    header->setContentsMargins(0, 0, 0, 0);
     auto *swatches = new QWidget(this);
-    swatches->setFixedSize(48, 44);
+    swatches->setFixedSize(24, 24);
     m_background = new QToolButton(swatches);
     m_foreground = new QToolButton(swatches);
-    m_background->setGeometry(18, 14, 28, 28);
-    m_foreground->setGeometry(2, 0, 28, 28);
+    m_background->setGeometry(8, 8, 16, 16);
+    m_foreground->setGeometry(0, 0, 16, 16);
     m_background->setToolTip(i18nc("@info:tooltip", "Background color; click to swap colors"));
     m_foreground->setToolTip(i18nc("@info:tooltip", "Foreground color; click to swap colors"));
-    layout->addWidget(swatches, 0, Qt::AlignLeft);
+    header->addWidget(swatches, 0, Qt::AlignLeft | Qt::AlignTop);
+    header->addStretch();
+
+    m_shapeButton = new QToolButton(this);
+    m_shapeButton->setIcon(KisIconUtils::loadIcon(QStringLiteral("view-choose")));
+    m_shapeButton->setAutoRaise(true);
+    m_shapeButton->setPopupMode(QToolButton::InstantPopup);
+    m_shapeButton->setToolTip(i18nc("@info:tooltip", "Selector shape"));
+    auto *shapeMenu = new QMenu(m_shapeButton);
+    auto *shapeRow = new QWidget(shapeMenu);
+    auto *shapeLayout = new QHBoxLayout(shapeRow);
+    shapeLayout->setContentsMargins(8, 8, 8, 8);
+    m_shapeGroup = new QButtonGroup(shapeRow);
+    for (Shape shape : {Shape::Slider, Shape::Ring}) {
+        auto *button = new QToolButton(shapeRow);
+        button->setCheckable(true);
+        button->setAutoRaise(true);
+        button->setIconSize(QSize(72, 72));
+        button->setToolTip(shape == Shape::Ring ? i18nc("@info:tooltip", "Square inside a hue ring")
+                                                : i18nc("@info:tooltip", "Hue bar and square"));
+        m_shapeGroup->addButton(button, int(shape));
+        shapeLayout->addWidget(button);
+    }
+    auto *shapeAction = new QWidgetAction(shapeMenu);
+    shapeAction->setDefaultWidget(shapeRow);
+    shapeMenu->addAction(shapeAction);
+    connect(shapeMenu, &QMenu::aboutToShow, this, &QuickColorSelectorWidget::updateShapeIcons);
+    connect(m_shapeGroup, &QButtonGroup::idClicked, this, [shapeMenu](int id) {
+        shapeMenu->close();
+        KConfigGroup config = KSharedConfig::openConfig()->group(QStringLiteral("QuickAccessHueSVC"));
+        config.writeEntry(ShapeKey, Shape(id) == Shape::Ring ? QStringLiteral("ring") : QStringLiteral("slider"));
+        config.sync();
+        Q_EMIT ShapeNotifier::instance()->shapeChanged();
+    });
+    m_shapeButton->setMenu(shapeMenu);
+    header->addWidget(m_shapeButton, 0, Qt::AlignRight | Qt::AlignTop);
+    layout->addLayout(header);
 
     m_selector = new KisVisualColorSelector(this);
     m_selector->setMinimumSize(210, 210);
@@ -51,6 +130,8 @@ QuickColorSelectorWidget::QuickColorSelectorWidget(QWidget *parent)
     m_selector->setStretchLimit(100.0);
     m_selector->setSliderPosition(Qt::LeftEdge);
     m_selector->setRenderMode(KisVisualColorSelector::StaticBackground);
+    setShape(storedShape());
+    connect(ShapeNotifier::instance(), &ShapeNotifier::shapeChanged, this, &QuickColorSelectorWidget::slotShapeChanged);
     layout->addWidget(m_selector, 1);
 
     auto *channels = new QGridLayout;
@@ -187,13 +268,53 @@ void QuickColorSelectorWidget::slotSwapColors()
     m_resourceProvider->setBGColor(foreground);
 }
 
+void QuickColorSelectorWidget::slotShapeChanged()
+{
+    setShape(storedShape());
+}
+
+void QuickColorSelectorWidget::setShape(Shape shape)
+{
+    const KisColorSelectorConfiguration config = configuration(shape);
+    m_selector->setConfiguration(&config);
+    if (QAbstractButton *button = m_shapeGroup->button(int(shape)))
+        button->setChecked(true);
+}
+
+void QuickColorSelectorWidget::updateShapeIcons()
+{
+    // Rendered previews, as the Wide Gamut Color Selector's shape grid draws
+    // them (WGSelectorConfigGrid::generateIcon()).
+    const qreal ratio = devicePixelRatioF();
+    const int size = 72;
+    // A hidden child needs a color space and a color to draw anything.
+    const KoColorSpace *rgb = KoColorSpaceRegistry::instance()->rgb8();
+    KisVisualColorSelector preview(this);
+    preview.setVisible(false);
+    preview.setEnabled(false);
+    preview.setMinimumSliderWidth(10);
+    preview.setSliderPosition(Qt::LeftEdge);
+    preview.setGeometry(0, 0, size, size);
+    preview.slotSetColorSpace(rgb);
+    preview.slotSetColor(KoColor(QColor(255, 0, 0), rgb));
+    for (Shape shape : {Shape::Slider, Shape::Ring}) {
+        const KisColorSelectorConfiguration config = configuration(shape);
+        preview.setConfiguration(&config);
+        QPixmap pixmap(QSize(size, size) * ratio);
+        pixmap.setDevicePixelRatio(ratio);
+        pixmap.fill(Qt::transparent);
+        preview.render(&pixmap, QPoint(), QRegion(), RenderFlag::DrawChildren);
+        m_shapeGroup->button(int(shape))->setIcon(QIcon(pixmap));
+    }
+}
+
 void QuickColorSelectorWidget::updateSwatches()
 {
     if (!m_resourceProvider)
         return;
     const QColor foreground = m_resourceProvider->fgColor().toQColor();
     const QColor background = m_resourceProvider->bgColor().toQColor();
-    m_foreground->setStyleSheet(QStringLiteral("background-color: %1; border: 2px solid palette(highlight);")
+    m_foreground->setStyleSheet(QStringLiteral("background-color: %1; border: 1px solid palette(highlight);")
                                     .arg(foreground.name(QColor::HexArgb)));
     m_background->setStyleSheet(
         QStringLiteral("background-color: %1; border: 1px solid palette(mid);").arg(background.name(QColor::HexArgb)));
@@ -313,3 +434,5 @@ KoDockFactoryBase::DockPosition QuickColorSelectorDockFactory::defaultDockPositi
 {
     return DockRight;
 }
+
+#include "QuickColorSelectorDock.moc"

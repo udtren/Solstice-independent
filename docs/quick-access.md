@@ -10,8 +10,12 @@ Quick Access palette, HueSVC popup and Quick Brush Adjustments take their
 place. Right-click with a brush tool does nothing; other tools keep their
 right-click menus.
 
-HueSVC places compact overlapping foreground and background color swatches at
-the selector's top-left. Clicking either swatch swaps the two colors.
+HueSVC places small overlapping foreground and background color swatches at
+the selector's top-left, like the Wide Gamut Color Selector's. Clicking either
+swatch swaps the two colors. The button at the top right chooses the selector
+shape: a vertical hue bar left of the saturation/value square (the default),
+or the square inside a hue ring. The choice applies to the HueSVC docker and
+its popup and does not follow the Advanced Color Selector's shape.
 Its popup uses a fixed-width vertical adjustment panel so each brush and layer
 slider spans the panel, matching the original plugin layout. Docker-only status
 buttons and their separators are omitted from the popup. Opening either brush

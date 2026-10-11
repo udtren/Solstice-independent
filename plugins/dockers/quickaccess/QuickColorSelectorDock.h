@@ -16,7 +16,9 @@
 
 class KisCanvas2;
 class KisCanvasResourceProvider;
+class KisColorSelectorConfiguration;
 class KisVisualColorSelector;
+class QButtonGroup;
 class QColor;
 class QSlider;
 class QSpinBox;
@@ -29,15 +31,29 @@ public:
     explicit QuickColorSelectorWidget(QWidget *parent = nullptr);
     void setCanvas(KisCanvas2 *canvas);
 
+    /// The selector shapes offered by the header button (user request
+    /// 2026-10-11): a vertical hue bar left of the S/V square, or the square
+    /// inside a hue ring. Stored as QuickAccessHueSVC/SelectorShape; HueSVC no
+    /// longer follows the Advanced Color Selector's shape.
+    enum class Shape {
+        Slider,
+        Ring
+    };
+    static Shape storedShape();
+    static KisColorSelectorConfiguration configuration(Shape shape);
+
 private Q_SLOTS:
     void slotSelectorColorChanged(const KoColor &color);
     void slotCanvasColorChanged(const KoColor &color);
     void slotRgbChanged();
     void slotHsvChanged();
     void slotSwapColors();
+    void slotShapeChanged();
 
 private:
     void updateSwatches();
+    void setShape(Shape shape);
+    void updateShapeIcons();
     void updateRgb(const KoColor &color);
     void updateChannelGradients(const QColor &color);
 
@@ -46,6 +62,8 @@ private:
     KisVisualColorSelector *m_selector{nullptr};
     QToolButton *m_foreground{nullptr};
     QToolButton *m_background{nullptr};
+    QToolButton *m_shapeButton{nullptr};
+    QButtonGroup *m_shapeGroup{nullptr};
     QSpinBox *m_red{nullptr};
     QSpinBox *m_green{nullptr};
     QSpinBox *m_blue{nullptr};

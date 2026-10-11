@@ -181,7 +181,19 @@ cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P <krita-dev-root>\_build\plugins\dockers\qu
   a vivid static full-saturation/default-lightness rainbow while the S/V square
   is dynamic. Rectangular static hue rendering is in
   `KisVisualRectangleSelectorShape`. The foreground/background controls use
-  overlapping 28 px swatches inside a 48 × 44 px top-left container.
+  overlapping 16 px swatches inside a 24 × 24 px top-left container, the size
+  of the Wide Gamut Color Selector's `KisColorSourceToggle` (user request
+  2026-10-11; they were 28 px in a 48 × 44 px container).
+- Selector shape (user request 2026-10-11): HueSVC sets its own
+  `KisColorSelectorConfiguration` with `KisVisualColorSelector::setConfiguration()`,
+  which also stops it from following `[advancedColorSelector]
+  colorSelectorConfiguration`. Before, HueSVC showed whatever shape the
+  Advanced Color Selector used, so a new profile showed Krita's default
+  triangle and ring. Two shapes: `slider` (Square + Slider, SV + H, default)
+  and `ring` (Square + Ring, SV + H), stored as `[QuickAccessHueSVC]
+  SelectorShape`. The `view-choose` header button opens a menu with two
+  rendered previews (drawn like `WGSelectorConfigGrid::generateIcon()`); a
+  file-local `ShapeNotifier` updates the docker and an open popup together.
 - The hue strip and the square fill all of the docker's spare height; the
   H/S/V/R/G/B rows below keep a fixed height (user request 2026-10-07).
   `KisVisualColorSelector` limits the square to 1.5 times its width by
