@@ -453,7 +453,14 @@ Kept as they are (recommended):
 - the upstream renderer, tablet (WinTab), cursor, autosave (7 min), undo
   (200), new document size (A4 at 300 ppi) and welcome-page news (off)
   defaults;
-- the window layout from the embedded `[MainWindow] State`.
+- the window layout from the embedded `[MainWindow] State`. Since
+  2026-10-11 (user request) it is the user's "Solstice" workspace, and
+  `krita/data/workspaces/Default.kws` holds the same state (renamed to
+  "Default"), so a new profile's first layout and the Default workspace
+  match. To change both, save a workspace, copy its `<state>` into
+  `[MainWindow] State` and the whole file (renamed) into `Default.kws`;
+  rebuild `krita` (the embedded defaults) and install `krita/data/workspaces`.
+  Existing profiles keep their own layout.
 
 Effects:
 

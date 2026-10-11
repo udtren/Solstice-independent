@@ -638,3 +638,27 @@ Format: `## YYYY-MM-DD <kind>: <subject>`, then what changed and the sources.
 - Pitfall: `wdggeneralsettings.ui` has mixed line endings; match edits with
   the section's own endings.
 - User manual check OK on 2026-10-10.
+
+## 2026-10-11 ingest: HueSVC shape button and swatches
+
+- HueSVC chooses its own shape (hue bar + square by default, or square in a
+  hue ring) from a header button and no longer follows the Advanced Color
+  Selector's `colorSelectorConfiguration`; its swatches match the Wide Gamut
+  Color Selector's 24 px toggle ([quick-access.md](../quick-access.md)).
+- Lesson: a fresh profile showed a triangle because HueSVC inherited the
+  Advanced Color Selector's default; shared configuration keys make one
+  docker's defaults leak into another.
+- Pitfall: an off-screen `KisVisualColorSelector` used for previews needs a
+  color space and a color (`slotSetColorSpace()`, `slotSetColor()`), or it
+  renders nothing.
+- User manual check OK on 2026-10-11.
+
+## 2026-10-11 ingest: default workspace and first layout
+
+- The user's "Solstice" workspace became `krita/data/workspaces/Default.kws`
+  and the embedded `[MainWindow] State`, so a new profile's first layout and
+  the Default workspace match ([settings-location.md](../settings-location.md)).
+- Lesson: the first-start layout comes from the embedded kritarc, not from
+  `Default.kws`; changing only the workspace file leaves new profiles as
+  they were.
+- User manual check OK on 2026-10-11.
